@@ -70,4 +70,5 @@ theme: next
 deploy:
   type: git
   repo: https://github.com/DemosBin/demosbin.github.io.git
+  # repo: ssh://git@github.com:DemosBin/demosbin.github.io.git
   branch: master
