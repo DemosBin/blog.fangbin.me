@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="git, demos, fangbin" />
+  <meta name="keywords" content="jvm,java," />
 
 
 
@@ -84,17 +84,23 @@
 
 
 
-<meta name="description" content="其实本来没什么必要，但是还是留下了hexo的默认页面，纪念开始使用hexo写blog,也算是给自己动力吧，以及什么时候忘记了hexo的命令找起文档来也是极方便的~官方文档很详细，就不再另介绍搭建过程了。Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any pr">
+<meta name="description" content="前言各位大大或者小白算是都知道，同比而言，java在各种各种的编程语言里算是极好入门的，有面向对象，没有让人脑瓜疼的指针，有自己的垃圾回收机制，有虚拟机,敲！重！点！了！——虚!拟!机!，一次编译处处运行这个功能对于程序员来说简直不要太友好，小白们(包括我自己)只要随手找个视频，分分钟一个helloword就出来了，然后学会CRUD，SSM什么的就可以走向工作岗位可以算是java入门了然鹅，然鹅啊">
+<meta name="keywords" content="jvm,java">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://yoursite.com/2016/12/31/hello-world/index.html">
+<meta property="og:title" content="JAVA入门到再次入门——深入理解JAVA虚拟机（一）">
+<meta property="og:url" content="http://yoursite.com/2018/07/14/Deep-understanding-of-Java-1/index.html">
 <meta property="og:site_name" content="一只特立独行的猫">
-<meta property="og:description" content="其实本来没什么必要，但是还是留下了hexo的默认页面，纪念开始使用hexo写blog,也算是给自己动力吧，以及什么时候忘记了hexo的命令找起文档来也是极方便的~官方文档很详细，就不再另介绍搭建过程了。Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any pr">
+<meta property="og:description" content="前言各位大大或者小白算是都知道，同比而言，java在各种各种的编程语言里算是极好入门的，有面向对象，没有让人脑瓜疼的指针，有自己的垃圾回收机制，有虚拟机,敲！重！点！了！——虚!拟!机!，一次编译处处运行这个功能对于程序员来说简直不要太友好，小白们(包括我自己)只要随手找个视频，分分钟一个helloword就出来了，然后学会CRUD，SSM什么的就可以走向工作岗位可以算是java入门了然鹅，然鹅啊">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://on557pwy7.bkt.clouddn.com/hexo/image/jvmjava%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://on557pwy7.bkt.clouddn.com/hexo/image/jvm/helloworld.png">
+<meta property="og:image" content="http://on557pwy7.bkt.clouddn.com/hexo/image/jvm/jvmprocess.png">
+<meta property="og:image" content="http://on557pwy7.bkt.clouddn.com/hexo/image/jvm/dataArea.png">
 <meta property="og:updated_time" content="2018-10-10T02:09:14.981Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="其实本来没什么必要，但是还是留下了hexo的默认页面，纪念开始使用hexo写blog,也算是给自己动力吧，以及什么时候忘记了hexo的命令找起文档来也是极方便的~官方文档很详细，就不再另介绍搭建过程了。Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any pr">
+<meta name="twitter:title" content="JAVA入门到再次入门——深入理解JAVA虚拟机（一）">
+<meta name="twitter:description" content="前言各位大大或者小白算是都知道，同比而言，java在各种各种的编程语言里算是极好入门的，有面向对象，没有让人脑瓜疼的指针，有自己的垃圾回收机制，有虚拟机,敲！重！点！了！——虚!拟!机!，一次编译处处运行这个功能对于程序员来说简直不要太友好，小白们(包括我自己)只要随手找个视频，分分钟一个helloword就出来了，然后学会CRUD，SSM什么的就可以走向工作岗位可以算是java入门了然鹅，然鹅啊">
+<meta name="twitter:image" content="http://on557pwy7.bkt.clouddn.com/hexo/image/jvmjava%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
 
 
 
@@ -115,9 +121,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/12/31/hello-world/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/07/14/Deep-understanding-of-Java-1/"/>
 
-  <title> Hello World | 一只特立独行的猫 </title>
+  <title> JAVA入门到再次入门——深入理解JAVA虚拟机（一） | 一只特立独行的猫 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -257,7 +263,7 @@
             
             
               
-                Hello World
+                JAVA入门到再次入门——深入理解JAVA虚拟机（一）
               
             
           </h1>
@@ -269,19 +275,38 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-12-31T18:02:03+08:00" content="2016-12-31">
-              2016-12-31
+            <time itemprop="dateCreated" datetime="2018-07-14T15:02:03+08:00" content="2018-07-14">
+              2018-07-14
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/12/31/hello-world/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/31/hello-world/" itemprop="commentsCount"></span>
+                <a href="/2018/07/14/Deep-understanding-of-Java-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/07/14/Deep-understanding-of-Java-1/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -304,15 +329,17 @@
       
 
       
-        <p>其实本来没什么必要，但是还是留下了hexo的默认页面，纪念开始使用hexo写blog,也算是给自己动力吧，以及什么时候忘记了hexo的命令找起文档来也是极方便的~<a href="https://hexo.io/docs/" target="_blank" rel="noopener">官方文档</a>很详细，就不再另介绍搭建过程了。<br>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>各位大大或者小白算是都知道，同比而言，java在各种各种的编程语言里算是极好入门的，有面向对象，没有让人脑瓜疼的指针，有自己的垃圾回收机制，有<strong>虚拟机</strong>,敲！重！点！了！——<strong>虚!拟!机!</strong>，一次编译处处运行这个功能对于程序员来说简直不要太友好，小白们(包括我自己)只要随手找个视频，分分钟一个helloword就出来了，然后学会CRUD，SSM什么的就可以走向工作岗位可以算是java入门了<br>然鹅，然鹅啊，同学们，Java入门到大神之间是有很多道不可逾越的鸿沟的~为了跨越一道道鸿沟，我们必先拿下<strong>java虚拟机</strong>啊喂！拿下虚拟机这才算是再次入门了~</p>
+<h1 id="JVM基本原理"><a href="#JVM基本原理" class="headerlink" title="JVM基本原理"></a>JVM基本原理</h1><p>as we all konw,所有程序的执行，最终都不过是寄存器里的001010101010，又有不同平台的机器码又是不一样的，那么java怎么就做到了一次编译处处运行呢？并不是java的语言是多通用，而是和java的运行流程相关：<br><img src="http://on557pwy7.bkt.clouddn.com/hexo/image/jvmjava%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B.png" alt="java运行流程" title="java运行流程"><br>java程序经过编译之后，将java代码编译为字节码也就是class文件，然后在不同的操作系统上依靠不同的java虚拟机进行解释，最后再转换为不同平台的机器码，最终得到执行。如此就是java的运行原理了。<br>然而光知道这个可是不够的，随手来一段helloworld继续了解下java编译到运行经过了哪些步骤好了：</p>
+<p><img src="http://on557pwy7.bkt.clouddn.com/hexo/image/jvm/helloworld.png" alt="helloworld"></p>
+<p><img src="http://on557pwy7.bkt.clouddn.com/hexo/image/jvm/jvmprocess.png" alt="编译到运行步骤"><br>java代码通过编译(javac HelloWorld.java)之后生成字节码文件（.class文件），通过：java HelloWorld执行，此时java根据环境变量找到jvm.cfg，windows下的路径：%JAVA_HOME%\jre\lib\amd64\jvm.cfg，然后随手找个编辑器打开看内容（#注释的内容咱不管了哈）：</p>
+<blockquote>
+<p>-server KNOWN<br>-client IGNORE</p>
+</blockquote>
+<p>其中-server KNOWN就表示名称为server的jvm可用，然后%JAVA_HOME%\jre\bin\server目录下可以找到jvm的主要实现——jvm.dll文件了，接下来会初始化JVM,并且获取JNI接口，JNI接口就是java本地接口，一般用于java和操作系统、硬件交互，JVM通过JNI从硬盘上找到编译好的.class文件，然后放CD一样把class文件载入jvm，然后找到main方法，最后执行。</p>
+<h1 id="Java基本结构"><a href="#Java基本结构" class="headerlink" title="Java基本结构"></a>Java基本结构</h1><p>可能通过上面的描述，大家对JVM运行流程有了一个粗略的认识，那么JVM内部到底是怎么执行一个class文件的呢，也就是上图中最后一步第6步的内部细节是怎样的呢？要了解这个问题，我们首先得看一下JVM的内部结构：</p>
+<p><img src="http://on557pwy7.bkt.clouddn.com/hexo/image/jvm/dataArea.png" alt="JVM内部结构"><br>讲真，从PDF上弄下来的一张极度不清晰的图片也是很对不起~<br>从这个结构不难看出，class文件被jvm装载以后，经过jvm的内存空间调配，最终是由执行引擎完成class文件的执行。当然这个过程还有其他角色模块的协助，这些模块协同配合才能让一个java程序成功的运行，下面就详细介绍这些模板。<br>JVM内存空间包含：方法区、堆、虚拟机栈、本地方法栈、程序计数器。<br>方法区是各个线程共享的区域，存放类信息、常量、静态变量。<br>java堆也是线程共享的区域，我们的类的实例就放在这个区域，可以想象你的一个系统会产生很多实例，因此java堆的空间也是最大的。如果java堆空间不足了，程序会抛出OutOfMemoryError异常。<br>java虚拟机栈是每个线程私有的区域，它的生命周期与线程相同，一个线程对应一个java栈，每执行一个方法就会往栈中压入一个元素，这个元素叫“栈帧”，而栈帧中包括了方法中的局部变量、用于存放中间状态值的操作栈，这里面有很多细节，我们以后再讲。如果java栈空间不足了，程序会抛出StackOverflowError异常，想一想什么情况下会容易产生这个错误，对，递归，递归如果深度很深，就会执行大量的方法，方法越多java栈的占用空间越大。<br>本地方法栈角色和java虚拟机栈类似，只不过它是用来表示执行本地方法的，本地方法栈存放的方法调用本地方法接口，最终调用本地方法库，实现与操作系统、硬件交互的目的。<br>程序计数器是一块较小的内存空间，可以看作是当前线程所执行的字节码的行号指示器。<br>执行引擎当然就是根据PC寄存器调配的指令顺序，依次执行程序指令。</p>
+<p>OKl了，聊完了Java虚拟机的基本运行流程和内部结构，就先到此为止，第二章结束(第一章？Java历史与展望以及自己编译一个jdk什么的求放过~)</p>
 
       
     </div>
@@ -333,17 +360,29 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag">#jvm</a>
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/06/26/软件开发入门指引/" rel="next" title="软件开发入门指引">
+                <i class="fa fa-chevron-left"></i> 软件开发入门指引
+              </a>
+            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/01/04/使用自己的域名访问hexo/" rel="prev" title="使用自己的域名访问hexo">
-                使用自己的域名访问hexo <i class="fa fa-chevron-right"></i>
+              <a href="/2018/07/19/mybatis-judge/" rel="prev" title="mybatis 参数判断条件">
+                mybatis 参数判断条件 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -370,8 +409,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/12/31/hello-world/"
-           data-title="Hello World" data-url="http://yoursite.com/2016/12/31/hello-world/">
+      <div class="ds-thread" data-thread-key="2018/07/14/Deep-understanding-of-Java-1/"
+           data-title="JAVA入门到再次入门——深入理解JAVA虚拟机（一）" data-url="http://yoursite.com/2018/07/14/Deep-understanding-of-Java-1/">
       </div>
     
   </div>
@@ -482,7 +521,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JVM基本原理"><span class="nav-number">2.</span> <span class="nav-text">JVM基本原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Java基本结构"><span class="nav-number">3.</span> <span class="nav-text">Java基本结构</span></a></li></ol></div>
             
           </div>
         </section>

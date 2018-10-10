@@ -1,0 +1,668 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="jvm,java," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前言为什么叫做入门到到再次入门请参考前一篇，在此不再赘述，哼哼，了解了JVM的基本运行流程以及内存结构，算是初步认识了JVM，跟着课本往前走，继续了解根据JVM的内存模型探索java当中变量的可见性以及不同的java指令在并发时可能发生的指令重排序的情况。 内存模型首先我们思考一下一个java线程要向另外一个线程进行通信，应该怎么做，我们再把需求明确一点，一个java线程对一个变量的更新怎么通知到">
+<meta name="keywords" content="jvm,java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAVA入门到再次入门——深入理解JAVA虚拟机（二）">
+<meta property="og:url" content="http://yoursite.com/2018/07/20/Deep-understanding-of-Java-2/index.html">
+<meta property="og:site_name" content="一只特立独行的猫">
+<meta property="og:description" content="前言为什么叫做入门到到再次入门请参考前一篇，在此不再赘述，哼哼，了解了JVM的基本运行流程以及内存结构，算是初步认识了JVM，跟着课本往前走，继续了解根据JVM的内存模型探索java当中变量的可见性以及不同的java指令在并发时可能发生的指令重排序的情况。 内存模型首先我们思考一下一个java线程要向另外一个线程进行通信，应该怎么做，我们再把需求明确一点，一个java线程对一个变量的更新怎么通知到">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091900412-195608484.png">
+<meta property="og:image" content="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091902006-644572602.png">
+<meta property="og:image" content="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091902834-9216833.png">
+<meta property="og:image" content="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091903803-1960343411.png">
+<meta property="og:image" content="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091904740-1959887440.png">
+<meta property="og:updated_time" content="2018-10-10T02:09:14.981Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JAVA入门到再次入门——深入理解JAVA虚拟机（二）">
+<meta name="twitter:description" content="前言为什么叫做入门到到再次入门请参考前一篇，在此不再赘述，哼哼，了解了JVM的基本运行流程以及内存结构，算是初步认识了JVM，跟着课本往前走，继续了解根据JVM的内存模型探索java当中变量的可见性以及不同的java指令在并发时可能发生的指令重排序的情况。 内存模型首先我们思考一下一个java线程要向另外一个线程进行通信，应该怎么做，我们再把需求明确一点，一个java线程对一个变量的更新怎么通知到">
+<meta name="twitter:image" content="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091900412-195608484.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/20/Deep-understanding-of-Java-2/"/>
+
+  <title> JAVA入门到再次入门——深入理解JAVA虚拟机（二） | 一只特立独行的猫 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?0e48697a7fe8a0a29a1fedd6131794f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">一只特立独行的猫</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JAVA入门到再次入门——深入理解JAVA虚拟机（二）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-07-20T22:13:18+08:00" content="2018-07-20">
+              2018-07-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/07/20/Deep-understanding-of-Java-2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/07/20/Deep-understanding-of-Java-2/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>为什么叫做入门到到再次入门请参考<a href="http://blog.fangbin.me/2018/07/14/Deep-understanding-of-Java-1/#more" target="_blank" rel="noopener">前一篇</a>，在此不再赘述，哼哼，了解了JVM的基本运行流程以及内存结构，算是初步认识了JVM，跟着课本往前走，继续了解根据JVM的内存模型探索java当中变量的可见性以及不同的java指令在并发时可能发生的指令重排序的情况。</p>
+<h1 id="内存模型"><a href="#内存模型" class="headerlink" title="内存模型"></a>内存模型</h1><p>首先我们思考一下一个java线程要向另外一个线程进行通信，应该怎么做，我们再把需求明确一点，一个java线程对一个变量的更新怎么通知到另外一个线程呢？我们知道java当中的实例对象、数组元素都放在java堆中，java堆是线程共享的。（我们这里把java堆称为主内存），而每一个线程都是自己私有的内存空间（称为工作内存），如果线程1要向线程2通信，一定会经过类似的流程：<br><img src="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091900412-195608484.png" alt=""><br>1、 线程1将自己工作内存中的X更新为1并刷新到主内存中；<br>2、 线程2从主内存读取变量X=1，更新到自己的工作内存中，从而线程2读取的X就是线程1更新后的值。<br>从上面的流程看出线程之间的通信都需要经过主内存，而主内存与工作内存的交互，则需要Java内存模型（JMM）来管理器。下图演示了JMM如何管理主内存和工作内存：<br><img src="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091902006-644572602.png" alt=""><br>当线程1需要将一个更新后的变量值刷新到主内存中时，需要经过两个步骤：<br>1、 工作内存执行store操作；<br>2、 主内存执行write操作；<br>完成这两步即可将工作内存中的变量值刷新到主内存，即线程1工作内存和主内存的变量值保持一致；<br>当线程2需要从主内存中读取变量的最新值时，同样需要经过两个步骤：<br>1、主内存执行read操作，将变量值从主内存中读取出来；<br>2、工作内存执行load操作，将读取出来的变量值更新到本地内存的副本；<br>完成这两步，线程2的变量和主内存的变量值就保持一致了。</p>
+<h1 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h1><p> Java中有一个关键字volatile，它有什么用呢？这个答案其实就在上述java线程间通信机制中，我们想象一下，由于工作内存这个中间层的出现，线程1和线程2必然存在延迟的问题，例如线程1在工作内存中更新了变量，但还没刷新到主内存，而此时线程2获取到的变量值就是未更新的变量值，又或者线程1成功将变量更新到主内存，但线程2依然使用自己工作内存中的变量值，同样会出问题。不管出现哪种情况都可能导致线程间的通信不能达到预期的目的。例如以下例子：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//线程1 </span><br><span class="line">boolean stop = false; </span><br><span class="line">while(!stop)&#123; </span><br><span class="line">    doSomething(); </span><br><span class="line">&#125; </span><br><span class="line">//线程2</span><br><span class="line">stop = true;</span><br></pre></td></tr></table></figure></p>
+<p> 这个经典的例子表示线程2通过修改stop的值，控制线程1中断，但在真实环境中可能会出现意想不到的结果，线程2在执行之后，线程1并没有立刻中断甚至一直不会中断。出现这种现象的原因就是线程2对线程1的变量更新无法第一时间获取到。<br>但这一切等到Volatile出现后，再也不是问题，Volatile保证两件事：<br>1、 线程1工作内存中的变量更新会强制立即写入到主内存；<br>2、 线程2工作内存中的变量会强制立即失效，这使得线程2必须去主内存中获取最新的变量值。<br>所以这就理解了Volatile保证了变量的可见性，因为线程1对变量的修改能第一时间让线程2可见。</p>
+<h1 id="指令重排序"><a href="#指令重排序" class="headerlink" title="指令重排序"></a>指令重排序</h1><p>关于指令排序我们先看一段代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int a = 0; boolean flag = false;</span><br><span class="line">//线程1</span><br><span class="line">public void writer() &#123;</span><br><span class="line">    a = 1;</span><br><span class="line">    flag = true;</span><br><span class="line">&#125;</span><br><span class="line">//线程2</span><br><span class="line">public void reader() &#123;</span><br><span class="line">    if (flag) &#123;</span><br><span class="line">        int i= a+1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>线程1依次执行a=1,flag=true；线程2判断到flag==true后，设置i=a+1，根据代码语义，我们可能会推断此时i的值等于2，因为线程2在判断flag==true时，线程1已经执行了a=1；所以i的值等于a+1=1+1=2；但真实情况却不一定如此，引起这个问题的原因是线程1内部的两条语句a=1；flag=true；可能被重新排序执行，如图：<br><img src="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091902834-9216833.png" alt=""><br>这就是指令重排序的简单演示，两个赋值语句尽管他们的代码顺序是一前一后，但真正执行时却不一定按照代码顺序执行。你可能会说，有这个指令重排序那不是乱套了吗？我写的程序都不按我的代码流程走，这怎么玩？这个你可以放心，你的程序不会乱套，因为java和CPU、内存之间都有一套严格的指令重排序规则，哪些可以重排，哪些不能重排都有规矩的。下列流程演示了一个java程序从编译到执行会经历哪些重排序：<br><img src="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091903803-1960343411.png" alt=""><br>在这个流程中第一步属于编译器重排查，编译器重排序会按JMM的规范严格进行，换言之编译器重排序一般不会对程序的正确逻辑造成影响。第二、三步属于处理器重排序，处理器重排序JMM就不好管了，怎么办呢？它会要求java编译器在生成指令时加入内存屏障，内存屏障是什么？你可以理解为一个不透风的保护罩，把不能重排序的java指令保护起来，那么处理器在遇到内存屏障保护的指令时就不会对它进行重排序了。关于在哪些地方该加入内存屏障，内存屏障有哪些种类，各有什么作用，这些知识点这里就不再阐述了。可以参考JVM规范相关资料。<br>下面介绍一下在同一个线程中，不会被重排序的逻辑：<br><img src="https://images2017.cnblogs.com/blog/352511/201708/352511-20170814091904740-1959887440.png" alt=""><br>这三种情况中，任意改变一个代码的顺序，结果都会大不相同，对于这样的逻辑代码，是不会被重排序的。注意这是指单线程中不会被重排序，如果在多线程环境下，还是会产生逻辑问题，例如我们一开始举的例子。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag">#jvm</a>
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/19/mybatis-judge/" rel="next" title="mybatis 参数判断条件">
+                <i class="fa fa-chevron-left"></i> mybatis 参数判断条件
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/24/tomcat-deploy/" rel="prev" title="tomcat的三种部署方式">
+                tomcat的三种部署方式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/07/20/Deep-understanding-of-Java-2/"
+           data-title="JAVA入门到再次入门——深入理解JAVA虚拟机（二）" data-url="http://yoursite.com/2018/07/20/Deep-understanding-of-Java-2/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://on557pwy7.bkt.clouddn.com/hexo/image/491246352.jpg"
+               alt="一只特立独行的猫" />
+          <p class="site-author-name" itemprop="name">一只特立独行的猫</p>
+          <p class="site-description motion-element" itemprop="description">我说的你也信？484sa？</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://fangbin.me/" target="_blank" title="fangbin">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  fangbin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.fangbin.me/" target="_blank" title="方斌的博客">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  方斌的博客
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内存模型"><span class="nav-number">2.</span> <span class="nav-text">内存模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可见性"><span class="nav-number">3.</span> <span class="nav-text">可见性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#指令重排序"><span class="nav-number">4.</span> <span class="nav-text">指令重排序</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">一只特立独行的猫</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"demos-bin"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
